@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
@@ -21,29 +22,62 @@ interface MentorWithSkills extends Profile {
 }
 
 export function MentorsContent() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="pt-24 px-4 pb-10">
+          <div className="max-w-7xl mx-auto">
+            <Skeleton className="h-10 w-64 mb-4" />
+            <Skeleton className="h-4 w-96 mb-12" />
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <Skeleton key={i} className="h-80 rounded-[2.5rem]" />
+              ))}
+            </div>
+          </div>
+        </main>
+      </div>
+    }>
+      <MentorsList />
+    </Suspense>
+  )
+}
+
+function MentorsList() {
   const supabase = createClient()
+  const searchParams = useSearchParams()
   const [mentors, setMentors] = useState<MentorWithSkills[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   
   // Location filters
-    const [countryFilter, setCountryFilter] = useState<string>('all')
-    const [stateFilter, setStateFilter] = useState<string>('all')
-    const [cityFilter, setCityFilter] = useState<string>('all')
+  const [countryFilter, setCountryFilter] = useState<string>('all')
+  const [stateFilter, setStateFilter] = useState<string>('all')
+  const [cityFilter, setCityFilter] = useState<string>('all')
 
-    // Handle Country Change
-    const handleCountryChange = (value: string) => {
-      setCountryFilter(value)
-      setStateFilter('all')
-      setCityFilter('all')
-    }
+  useEffect(() => {
+    const country = searchParams.get('country')
+    const state = searchParams.get('state')
+    const city = searchParams.get('city')
 
-    // Handle State Change
-    const handleStateChange = (value: string) => {
-      setStateFilter(value)
-      setCityFilter('all')
-    }
+    if (country) setCountryFilter(country)
+    if (state) setStateFilter(state)
+    if (city) setCityFilter(city)
+  }, [searchParams])
 
+  // Handle Country Change
+  const handleCountryChange = (value: string) => {
+    setCountryFilter(value)
+    setStateFilter('all')
+    setCityFilter('all')
+  }
+
+  // Handle State Change
+  const handleStateChange = (value: string) => {
+    setStateFilter(value)
+    setCityFilter('all')
+  }
 
   useEffect(() => {
     fetchMentors()
