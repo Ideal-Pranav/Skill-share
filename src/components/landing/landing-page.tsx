@@ -250,11 +250,12 @@ export function LandingPage() {
                 whileHover={{ y: -10 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
+                className="h-full"
               >
-                <Link href={`/explore?category=${category.name.toLowerCase()}`}>
-                  <Card className="group cursor-pointer border-border bg-card/40 backdrop-blur-sm hover:bg-card hover:border-primary/50 transition-all duration-500 rounded-[2.5rem] p-4 overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-primary/10">
-                    <CardContent className="p-8 flex items-center gap-6">
-                      <div className={`w-20 h-20 rounded-[2rem] bg-gradient-to-br ${category.color} flex items-center justify-center group-hover:rotate-[15deg] transition-all duration-500 shadow-xl shadow-primary/10`}>
+                <Link href={`/explore?category=${category.name.toLowerCase()}`} className="block h-full">
+                  <Card className="group cursor-pointer border-border bg-card/40 backdrop-blur-sm hover:bg-card hover:border-primary/50 transition-all duration-500 rounded-[2.5rem] p-4 overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-primary/10 h-full">
+                    <CardContent className="p-8 flex items-center gap-6 h-full">
+                      <div className={`w-20 h-20 rounded-[2rem] bg-gradient-to-br ${category.color} flex items-center justify-center group-hover:rotate-[15deg] transition-all duration-500 shadow-xl shadow-primary/10 shrink-0`}>
                         <category.icon className="w-10 h-10 text-white" />
                       </div>
                       <div className="flex-1">
@@ -265,7 +266,7 @@ export function LandingPage() {
                           <span className="text-sm uppercase tracking-wider">Expert Mentors</span>
                         </div>
                       </div>
-                      <div className="w-10 h-10 rounded-full border border-border flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0">
+                      <div className="w-10 h-10 rounded-full border border-border flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0 shrink-0">
                         <ArrowRight className="w-5 h-5" />
                       </div>
                     </CardContent>
@@ -301,24 +302,24 @@ export function LandingPage() {
                   learning engine designed to remove barriers between curiosity and mastery.
                 </p>
 
-                <div className="grid sm:grid-cols-2 gap-8">
-                  {features.map((feature, idx) => (
-                    <motion.div 
-                      key={feature.title}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: idx * 0.1 }}
-                      className="group"
-                    >
-                      <div className="w-14 h-14 rounded-2xl bg-card border border-border flex items-center justify-center mb-6 group-hover:bg-primary group-hover:border-primary transition-all duration-300 shadow-lg group-hover:shadow-primary/20">
-                        <feature.icon className="w-7 h-7 text-primary group-hover:text-white transition-colors" />
-                      </div>
-                      <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                      <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
-                    </motion.div>
-                  ))}
-                </div>
+                  <div className="grid sm:grid-cols-2 gap-8">
+                    {features.map((feature, idx) => (
+                      <motion.div 
+                        key={feature.title}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: idx * 0.1 }}
+                        className="group h-full flex flex-col"
+                      >
+                        <div className="w-14 h-14 rounded-2xl bg-card border border-border flex items-center justify-center mb-6 group-hover:bg-primary group-hover:border-primary transition-all duration-300 shadow-lg group-hover:shadow-primary/20 shrink-0">
+                          <feature.icon className="w-7 h-7 text-primary group-hover:text-white transition-colors" />
+                        </div>
+                        <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
+                        <p className="text-muted-foreground text-sm leading-relaxed flex-1">{feature.description}</p>
+                      </motion.div>
+                    ))}
+                  </div>
               </motion.div>
             </div>
 
