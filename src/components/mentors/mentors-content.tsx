@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton'
 import { Search, MapPin, Star, CheckCircle2, MessageSquare, Calendar, Globe, ShieldCheck, Sparkles, Filter, ArrowRight, Users } from 'lucide-react'
 import type { Profile, UserSkill, Skill } from '@/lib/types/database'
+import { LOCATIONS, type CountryCode } from '@/lib/constants'
 
 interface MentorWithSkills extends Profile {
   skills: (UserSkill & { skill: Skill })[]
@@ -26,9 +27,23 @@ export function MentorsContent() {
   const [searchQuery, setSearchQuery] = useState('')
   
   // Location filters
-  const [countryFilter, setCountryFilter] = useState<string>('all')
-  const [stateFilter, setStateFilter] = useState<string>('all')
-  const [cityFilter, setCityFilter] = useState<string>('all')
+    const [countryFilter, setCountryFilter] = useState<string>('all')
+    const [stateFilter, setStateFilter] = useState<string>('all')
+    const [cityFilter, setCityFilter] = useState<string>('all')
+
+    // Handle Country Change
+    const handleCountryChange = (value: string) => {
+      setCountryFilter(value)
+      setStateFilter('all')
+      setCityFilter('all')
+    }
+
+    // Handle State Change
+    const handleStateChange = (value: string) => {
+      setStateFilter(value)
+      setCityFilter('all')
+    }
+
 
   useEffect(() => {
     fetchMentors()
@@ -136,49 +151,67 @@ export function MentorsContent() {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <Select value={countryFilter} onValueChange={setCountryFilter}>
-                    <SelectTrigger className="h-12 bg-background border-border rounded-xl">
-                      <Globe className="w-4 h-4 mr-2 opacity-50 text-primary" />
-                      <SelectValue placeholder="Country" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Global (All Countries)</SelectItem>
-                      <SelectItem value="india">India</SelectItem>
-                      <SelectItem value="usa">USA</SelectItem>
-                      <SelectItem value="uk">UK</SelectItem>
-                      <SelectItem value="germany">Germany</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <Select value={countryFilter} onValueChange={handleCountryChange}>
+                      <SelectTrigger className="h-12 bg-background border-border rounded-xl">
+                        <Globe className="w-4 h-4 mr-2 opacity-50 text-primary" />
+                        <SelectValue placeholder="Country" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Global (All Countries)</SelectItem>
+                        {Object.entries(LOCATIONS).map(([code, data]) => (
+                          <SelectItem key={code} value={code}>{data.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
 
-                  <Select value={stateFilter} onValueChange={setStateFilter}>
-                    <SelectTrigger className="h-12 bg-background border-border rounded-xl">
-                      <MapPin className="w-4 h-4 mr-2 opacity-50 text-primary" />
-                      <SelectValue placeholder="State" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Any State</SelectItem>
-                      <SelectItem value="maharashtra">Maharashtra</SelectItem>
-                      <SelectItem value="california">California</SelectItem>
-                      <SelectItem value="berlin">Berlin</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <AnimatePresence mode="popLayout">
+                      {countryFilter !== 'all' && (
+                        <motion.div
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                        >
+                          <Select value={stateFilter} onValueChange={handleStateChange}>
+                            <SelectTrigger className="h-12 bg-background border-border rounded-xl">
+                              <MapPin className="w-4 h-4 mr-2 opacity-50 text-primary" />
+                              <SelectValue placeholder="State" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">Any State</SelectItem>
+                              {Object.entries(LOCATIONS[countryFilter as CountryCode].states).map(([code, data]) => (
+                                <SelectItem key={code} value={code}>{data.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
 
-                  <Select value={cityFilter} onValueChange={cityFilter === 'nashik' ? 'nashik' : cityFilter}>
-                    <SelectTrigger className="h-12 bg-background border-border rounded-xl">
-                      <MapPin className="w-4 h-4 mr-2 opacity-50 text-primary" />
-                      <SelectValue placeholder="City" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Any City</SelectItem>
-                      <SelectItem value="nashik">Nashik</SelectItem>
-                      <SelectItem value="mumbai">Mumbai</SelectItem>
-                      <SelectItem value="pune">Pune</SelectItem>
-                      <SelectItem value="new york">New York</SelectItem>
-                      <SelectItem value="london">London</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                    <AnimatePresence mode="popLayout">
+                      {stateFilter !== 'all' && (
+                        <motion.div
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                        >
+                          <Select value={cityFilter} onValueChange={setCityFilter}>
+                            <SelectTrigger className="h-12 bg-background border-border rounded-xl">
+                              <MapPin className="w-4 h-4 mr-2 opacity-50 text-primary" />
+                              <SelectValue placeholder="City" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">Any City</SelectItem>
+                              {LOCATIONS[countryFilter as CountryCode].states[stateFilter as keyof typeof LOCATIONS[CountryCode]['states']].cities.map((city) => (
+                                <SelectItem key={city} value={city.toLowerCase()}>{city}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
               </div>
             </CardContent>
           </Card>

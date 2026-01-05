@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -12,7 +12,7 @@ import {
   Star, CheckCircle2, Zap, Layout, ShieldCheck, ZapOff,
   CloudLightning, MousePointer2
 } from 'lucide-react'
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 
 const categories = [
   { name: 'Technology', icon: Code, color: 'from-indigo-500 to-blue-500', skills: 850 },
@@ -47,11 +47,27 @@ const features = [
 ]
 
 export function LandingPage() {
-  const containerRef = useRef(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
   })
+
+  // Mouse Glow Effect
+  const mouseX = useMotionValue(0)
+  const mouseY = useMotionValue(0)
+  const springX = useSpring(mouseX, { stiffness: 100, damping: 20 })
+  const springY = useSpring(mouseY, { stiffness: 100, damping: 20 })
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const { clientX, clientY } = e
+      mouseX.set(clientX)
+      mouseY.set(clientY)
+    }
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [mouseX, mouseY])
 
   const y1 = useTransform(scrollYProgress, [0, 1], [0, -200])
   const y2 = useTransform(scrollYProgress, [0, 1], [0, -500])
@@ -63,9 +79,26 @@ export function LandingPage() {
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
         {/* Animated Background Elements */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute top-1/4 -left-20 w-96 h-96 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
-          <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-violet-500/10 rounded-full blur-[100px] animate-pulse delay-700" />
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          {/* Main Glows */}
+          <div className="absolute top-1/4 -left-20 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] animate-pulse" />
+          <div className="absolute bottom-1/4 -right-20 w-[600px] h-[600px] bg-violet-500/20 rounded-full blur-[120px] animate-pulse delay-700" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-500/10 rounded-full blur-[160px] animate-pulse delay-1000" />
+          
+          {/* Interactive Mouse Glow */}
+          <motion.div
+            style={{
+              x: springX,
+              y: springY,
+              translateX: "-50%",
+              translateY: "-50%",
+            }}
+            className="fixed top-0 left-0 w-[400px] h-[400px] bg-primary/10 rounded-full blur-[100px] pointer-events-none z-50 hidden md:block"
+          />
+
+          {/* Grid Pattern */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+          
           <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none" />
         </div>
 
