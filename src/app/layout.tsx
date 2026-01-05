@@ -5,6 +5,8 @@ import { AuthProvider } from "@/lib/context/auth-context";
 import { Toaster } from "@/components/ui/sonner";
 import { VisualEditsMessenger } from "orchids-visual-edits";
 
+import { ThemeProvider } from "@/components/layout/theme-provider";
+
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
   subsets: ["latin"],
@@ -17,7 +19,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SkillShare Nashik | Learn & Teach Local Skills",
+  title: "SkillShare Platform | Learn & Teach Skills Globally",
   description: "Connect with mentors and learners in your community. Share skills, grow together.",
 };
 
@@ -27,15 +29,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${dmSans.variable} ${jetbrainsMono.variable} font-sans antialiased`}
+        className={`${dmSans.variable} ${jetbrainsMono.variable} font-sans antialiased transition-colors duration-300`}
       >
-        <AuthProvider>
-          {children}
-          <Toaster position="top-right" richColors />
-        </AuthProvider>
-        <VisualEditsMessenger />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            {children}
+            <Toaster position="top-right" richColors />
+          </AuthProvider>
+          <VisualEditsMessenger />
+        </ThemeProvider>
       </body>
     </html>
   );

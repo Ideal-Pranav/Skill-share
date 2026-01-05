@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
+import { motion, AnimatePresence } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { Navbar } from '@/components/layout/navbar'
 import { Card, CardContent } from '@/components/ui/card'
@@ -11,7 +12,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Search, Filter, Code, Palette, Briefcase, Globe, GraduationCap, Heart, Wrench, Star, Users } from 'lucide-react'
+import { Search, Filter, Code, Palette, Briefcase, Globe, GraduationCap, Heart, Wrench, Star, Users, MapPin, Sparkles } from 'lucide-react'
 import type { Skill, SkillCategory, UserSkill } from '@/lib/types/database'
 
 const categoryIcons: Record<string, React.ElementType> = {
@@ -36,6 +37,11 @@ export function ExploreContent() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory || 'all')
   const [difficultyFilter, setDifficultyFilter] = useState<string>('all')
+  
+  // Location filters
+  const [countryFilter, setCountryFilter] = useState<string>('all')
+  const [stateFilter, setStateFilter] = useState<string>('all')
+  const [cityFilter, setCityFilter] = useState<string>('all')
 
   useEffect(() => {
     fetchData()
@@ -53,7 +59,7 @@ export function ExploreContent() {
     
     if (mentorsRes.data) {
       const counts: Record<string, number> = {}
-      mentorsRes.data.forEach((us: UserSkill) => {
+      mentorsRes.data.forEach((us: any) => {
         counts[us.skill_id] = (counts[us.skill_id] || 0) + 1
       })
       setMentorCounts(counts)
@@ -91,12 +97,15 @@ export function ExploreContent() {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="pt-20 px-4 pb-10">
+        <main className="pt-24 px-4 pb-10">
           <div className="max-w-7xl mx-auto">
-            <Skeleton className="h-10 w-64 mb-8" />
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="space-y-4 mb-8">
+              <Skeleton className="h-10 w-64" />
+              <Skeleton className="h-4 w-96" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                <Skeleton key={i} className="h-40" />
+                <Skeleton key={i} className="h-48 rounded-[2rem]" />
               ))}
             </div>
           </div>
@@ -106,106 +115,206 @@ export function ExploreContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background selection:bg-primary/30">
       <Navbar />
       
-      <main className="pt-20 px-4 pb-10">
+      <main className="pt-24 px-4 pb-20">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Explore Skills</h1>
-            <p className="text-muted-foreground">
-              Discover skills to learn or find learners for skills you can teach
+          {/* Header Section */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-12"
+          >
+            <Badge variant="outline" className="mb-4 border-primary/20 bg-primary/5 text-primary">
+              <Sparkles className="w-3 h-3 mr-2" />
+              Global Skill Matrix
+            </Badge>
+            <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
+              Explore the <span className="text-primary">Ecosystem</span>
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl">
+              Discover industry-standard skills and connect with mentors across 
+              continents. Your growth path, localized.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="flex flex-col md:flex-row gap-4 mb-8">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input
-                placeholder="Search skills..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-card border-border"
-              />
-            </div>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full md:w-48 bg-card border-border">
-                <Filter className="w-4 h-4 mr-2" />
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border">
-                <SelectItem value="all">All Categories</SelectItem>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.name.toLowerCase()}>
-                    {cat.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
-              <SelectTrigger className="w-full md:w-48 bg-card border-border">
-                <SelectValue placeholder="Difficulty" />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border">
-                <SelectItem value="all">All Levels</SelectItem>
-                <SelectItem value="1">Beginner</SelectItem>
-                <SelectItem value="2">Elementary</SelectItem>
-                <SelectItem value="3">Intermediate</SelectItem>
-                <SelectItem value="4">Advanced</SelectItem>
-                <SelectItem value="5">Expert</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {selectedCategory === 'all' && searchQuery === '' ? (
-            <div className="space-y-10">
-              {Object.entries(groupedSkills).map(([categoryName, categorySkills]) => {
-                const IconComponent = categoryIcons[categoryName] || Code
-                return (
-                  <div key={categoryName}>
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                        <IconComponent className="w-5 h-5 text-primary" />
-                      </div>
-                      <h2 className="text-xl font-semibold">{categoryName}</h2>
-                      <Badge variant="secondary">{categorySkills.length} skills</Badge>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                      {categorySkills.map((skill) => (
-                        <SkillCard 
-                          key={skill.id} 
-                          skill={skill} 
-                          mentorCount={mentorCounts[skill.id] || 0}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          ) : (
-            <div>
-              <p className="text-muted-foreground mb-4">
-                {filteredSkills.length} skill{filteredSkills.length !== 1 ? 's' : ''} found
-              </p>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {filteredSkills.map((skill) => (
-                  <SkillCard 
-                    key={skill.id} 
-                    skill={skill} 
-                    mentorCount={mentorCounts[skill.id] || 0}
+          {/* Search and Advanced Filters */}
+          <Card className="mb-12 border-border bg-card/50 backdrop-blur-xl rounded-[2.5rem] p-2 overflow-hidden shadow-2xl shadow-primary/5">
+            <CardContent className="p-6">
+              <div className="flex flex-col space-y-6">
+                {/* Search Bar */}
+                <div className="relative group">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                  <Input
+                    placeholder="What skill would you like to master today?"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="h-14 pl-12 pr-4 bg-background border-border rounded-2xl text-lg focus:ring-primary/20"
                   />
-                ))}
+                </div>
+
+                {/* Filters Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger className="h-12 bg-background border-border rounded-xl">
+                      <SelectValue placeholder="Category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.name.toLowerCase()}>
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
+                    <SelectTrigger className="h-12 bg-background border-border rounded-xl">
+                      <SelectValue placeholder="Skill Level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Levels</SelectItem>
+                      <SelectItem value="1">Beginner</SelectItem>
+                      <SelectItem value="2">Elementary</SelectItem>
+                      <SelectItem value="3">Intermediate</SelectItem>
+                      <SelectItem value="4">Advanced</SelectItem>
+                      <SelectItem value="5">Expert</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={countryFilter} onValueChange={setCountryFilter}>
+                    <SelectTrigger className="h-12 bg-background border-border rounded-xl">
+                      <Globe className="w-4 h-4 mr-2 opacity-50" />
+                      <SelectValue placeholder="Country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Global</SelectItem>
+                      <SelectItem value="india">India</SelectItem>
+                      <SelectItem value="usa">USA</SelectItem>
+                      <SelectItem value="uk">UK</SelectItem>
+                      <SelectItem value="germany">Germany</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={stateFilter} onValueChange={setStateFilter}>
+                    <SelectTrigger className="h-12 bg-background border-border rounded-xl">
+                      <MapPin className="w-4 h-4 mr-2 opacity-50" />
+                      <SelectValue placeholder="State" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Any State</SelectItem>
+                      <SelectItem value="maharashtra">Maharashtra</SelectItem>
+                      <SelectItem value="california">California</SelectItem>
+                      <SelectItem value="berlin">Berlin</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={cityFilter} onValueChange={setCityFilter}>
+                    <SelectTrigger className="h-12 bg-background border-border rounded-xl">
+                      <MapPin className="w-4 h-4 mr-2 opacity-50" />
+                      <SelectValue placeholder="City" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Any City</SelectItem>
+                      <SelectItem value="nashik">Nashik</SelectItem>
+                      <SelectItem value="mumbai">Mumbai</SelectItem>
+                      <SelectItem value="pune">Pune</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-            </div>
-          )}
+            </CardContent>
+          </Card>
+
+          <AnimatePresence mode="popLayout">
+            {selectedCategory === 'all' && searchQuery === '' ? (
+              <div className="space-y-16">
+                {Object.entries(groupedSkills).map(([categoryName, categorySkills]) => {
+                  const IconComponent = categoryIcons[categoryName] || Code
+                  return (
+                    <motion.div 
+                      key={categoryName}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      <div className="flex items-center gap-4 mb-8">
+                        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                          <IconComponent className="w-6 h-6 text-primary" />
+                        </div>
+                        <div>
+                          <h2 className="text-2xl font-bold">{categoryName}</h2>
+                          <p className="text-sm text-muted-foreground">{categorySkills.length} Verified Skills</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {categorySkills.map((skill, idx) => (
+                          <SkillCard 
+                            key={skill.id} 
+                            skill={skill} 
+                            mentorCount={mentorCounts[skill.id] || 0}
+                            index={idx}
+                          />
+                        ))}
+                      </div>
+                    </motion.div>
+                  )
+                })}
+              </div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <div className="flex items-center justify-between mb-8">
+                  <p className="text-lg font-medium text-muted-foreground">
+                    <span className="text-foreground font-bold">{filteredSkills.length}</span> results matching your criteria
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {filteredSkills.map((skill, idx) => (
+                    <SkillCard 
+                      key={skill.id} 
+                      skill={skill} 
+                      mentorCount={mentorCounts[skill.id] || 0}
+                      index={idx}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {filteredSkills.length === 0 && (
-            <div className="text-center py-16">
-              <Search className="w-16 h-16 mx-auto text-muted-foreground/50 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No skills found</h3>
-              <p className="text-muted-foreground">Try adjusting your filters or search query</p>
-            </div>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center py-32 bg-card/30 rounded-[3rem] border border-dashed border-border mt-12"
+            >
+              <div className="w-24 h-24 bg-muted/50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Search className="w-10 h-10 text-muted-foreground/50" />
+              </div>
+              <h3 className="text-2xl font-bold mb-2">No matching skills found</h3>
+              <p className="text-muted-foreground max-w-sm mx-auto">
+                Try broadening your search or switching locations. We&apos;re constantly 
+                adding new programs globally.
+              </p>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setSearchQuery('')
+                  setSelectedCategory('all')
+                  setDifficultyFilter('all')
+                  setCountryFilter('all')
+                }}
+                className="mt-8 rounded-xl"
+              >
+                Reset All Filters
+              </Button>
+            </motion.div>
           )}
         </div>
       </main>
@@ -213,44 +322,59 @@ export function ExploreContent() {
   )
 }
 
-function SkillCard({ skill, mentorCount }: { skill: Skill; mentorCount: number }) {
+function SkillCard({ skill, mentorCount, index }: { skill: Skill; mentorCount: number; index: number }) {
   const difficultyLabels = ['Beginner', 'Elementary', 'Intermediate', 'Advanced', 'Expert']
+  const colors = ['bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-violet-500', 'bg-red-500']
   
   return (
-    <Link href={`/skills/${skill.id}`}>
-      <Card className="h-full border-border bg-card hover:border-primary/50 transition-all duration-300 group cursor-pointer">
-        <CardContent className="p-5">
-          <div className="flex items-start justify-between mb-3">
-            <h3 className="font-semibold group-hover:text-primary transition-colors">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.05 }}
+      whileHover={{ y: -8, rotateX: 2, rotateY: 2 }}
+      className="perspective-1000"
+    >
+      <Link href={`/skills/${skill.id}`}>
+        <Card className="h-full border-border bg-card/60 backdrop-blur-sm hover:bg-card hover:border-primary/50 transition-all duration-500 rounded-[2rem] overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl hover:shadow-primary/10">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex flex-col gap-1">
+                <Badge className={`${colors[skill.difficulty_level - 1]} text-white border-0 py-0.5 px-3 rounded-lg text-[10px] uppercase tracking-wider font-bold`}>
+                  {difficultyLabels[skill.difficulty_level - 1]}
+                </Badge>
+              </div>
+              <div className="w-10 h-10 rounded-full border border-border flex items-center justify-center bg-background group-hover:bg-primary group-hover:border-primary transition-all duration-500">
+                <ArrowRight className="w-4 h-4 group-hover:text-primary-foreground transition-colors" />
+              </div>
+            </div>
+            
+            <h3 className="text-xl font-bold mb-3 tracking-tight group-hover:text-primary transition-colors">
               {skill.name}
             </h3>
-            <Badge variant="outline" className="text-xs">
-              {difficultyLabels[skill.difficulty_level - 1]}
-            </Badge>
-          </div>
-          
-          {skill.description && (
-            <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-              {skill.description}
-            </p>
-          )}
-          
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <Users className="w-4 h-4" />
-              <span>{mentorCount} mentor{mentorCount !== 1 ? 's' : ''}</span>
+            
+            {skill.description && (
+              <p className="text-sm text-muted-foreground mb-6 line-clamp-2 leading-relaxed">
+                {skill.description}
+              </p>
+            )}
+            
+            <div className="flex items-center justify-between pt-6 border-t border-border/50">
+              <div className="flex items-center gap-2 text-primary font-bold">
+                <Users className="w-4 h-4" />
+                <span className="text-sm">{mentorCount} Mentors</span>
+              </div>
+              <div className="flex gap-0.5">
+                {[...Array(5)].map((_, i) => (
+                  <div 
+                    key={i} 
+                    className={`w-1.5 h-1.5 rounded-full ${i < skill.difficulty_level ? colors[skill.difficulty_level - 1] : 'bg-muted'}`} 
+                  />
+                ))}
+              </div>
             </div>
-            <div className="flex items-center gap-1">
-              {[...Array(5)].map((_, i) => (
-                <Star 
-                  key={i} 
-                  className={`w-3 h-3 ${i < skill.difficulty_level ? 'text-amber-400 fill-amber-400' : 'text-muted-foreground/30'}`} 
-                />
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </Link>
+          </CardContent>
+        </Card>
+      </Link>
+    </motion.div>
   )
 }

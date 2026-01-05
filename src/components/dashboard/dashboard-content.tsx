@@ -2,17 +2,19 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
 import { useAuth } from '@/lib/context/auth-context'
 import { createClient } from '@/lib/supabase/client'
 import { Navbar } from '@/components/layout/navbar'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
 import { 
   Calendar, MessageSquare, BookOpen, TrendingUp, 
-  Clock, Star, Users, ArrowRight, Plus
+  Clock, Star, Users, ArrowRight, Plus, Sparkles,
+  Award, Heart, ShieldCheck, MapPin, Zap
 } from 'lucide-react'
 import type { Session, UserSkill, Notification } from '@/lib/types/database'
 
@@ -71,14 +73,14 @@ export function DashboardContent() {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="pt-20 px-4 pb-10">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+        <main className="pt-24 px-4 pb-10">
+          <div className="max-w-7xl mx-auto space-y-8">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-32" />
+                <Skeleton key={i} className="h-32 rounded-[2rem]" />
               ))}
             </div>
-            <Skeleton className="h-64" />
+            <Skeleton className="h-[500px] rounded-[3rem]" />
           </div>
         </main>
       </div>
@@ -91,89 +93,119 @@ export function DashboardContent() {
 
   const stats = [
     { 
-      title: 'Upcoming Sessions', 
+      title: 'Active Sessions', 
       value: upcomingSessions.length.toString(), 
       icon: Calendar, 
-      color: 'text-blue-400',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10'
+    },
+    { 
+      title: 'Teaching Matrix', 
+      value: teachingSkills.length.toString(), 
+      icon: Award, 
+      color: 'text-blue-500',
       bgColor: 'bg-blue-500/10'
     },
     { 
-      title: 'Teaching Skills', 
-      value: teachingSkills.length.toString(), 
-      icon: BookOpen, 
-      color: 'text-emerald-400',
-      bgColor: 'bg-emerald-500/10'
-    },
-    { 
-      title: 'Learning Skills', 
+      title: 'Growth Path', 
       value: learningSkills.length.toString(), 
       icon: TrendingUp, 
-      color: 'text-purple-400',
-      bgColor: 'bg-purple-500/10'
+      color: 'text-violet-500',
+      bgColor: 'bg-violet-500/10'
     },
     { 
       title: 'Trust Score', 
       value: profile?.trust_score?.toFixed(1) || '0.0', 
       icon: Star, 
-      color: 'text-amber-400',
+      color: 'text-amber-500',
       bgColor: 'bg-amber-500/10'
     },
   ]
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background selection:bg-primary/30">
       <Navbar />
       
-      <main className="pt-20 px-4 pb-10">
+      <main className="pt-24 px-4 pb-20">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">
-              Welcome back, {profile?.full_name?.split(' ')[0]}!
-            </h1>
-            <p className="text-muted-foreground">
-              Here&apos;s what&apos;s happening with your learning journey
-            </p>
-          </div>
+          {/* Dashboard Header */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6"
+          >
+            <div>
+              <Badge variant="outline" className="mb-4 border-primary/20 bg-primary/5 text-primary">
+                <Sparkles className="w-3 h-3 mr-2" />
+                Operational Dashboard
+              </Badge>
+              <h1 className="text-4xl md:text-5xl font-black tracking-tight">
+                Welcome, <span className="text-primary">{profile?.full_name?.split(' ')[0]}</span>
+              </h1>
+              <p className="text-xl text-muted-foreground mt-2">
+                Monitoring your {profile?.city || 'global'} learning ecosystem.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Link href="/explore">
+                <Button className="h-12 px-6 rounded-xl bg-primary text-white shadow-lg shadow-primary/20 font-bold group">
+                  Explore Matrix
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-            {stats.map((stat) => (
-              <Card key={stat.title} className="border-border bg-card">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">{stat.title}</p>
-                      <p className="text-3xl font-bold mt-1">{stat.value}</p>
+          {/* Stats Grid */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-12">
+            {stats.map((stat, idx) => (
+              <motion.div
+                key={stat.title}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: idx * 0.1 }}
+              >
+                <Card className="border-border bg-card/40 backdrop-blur-xl rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">{stat.title}</p>
+                        <p className="text-4xl font-black mt-2 tracking-tighter">{stat.value}</p>
+                      </div>
+                      <div className={`w-14 h-14 rounded-2xl ${stat.bgColor} flex items-center justify-center border border-white/5`}>
+                        <stat.icon className={`w-7 h-7 ${stat.color}`} />
+                      </div>
                     </div>
-                    <div className={`w-12 h-12 rounded-xl ${stat.bgColor} flex items-center justify-center`}>
-                      <stat.icon className={`w-6 h-6 ${stat.color}`} />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-3">
-            <div className="lg:col-span-2 space-y-6">
-              <Card className="border-border bg-card">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-lg">Upcoming Sessions</CardTitle>
+          <div className="grid gap-8 lg:grid-cols-3">
+            {/* Primary Content Area */}
+            <div className="lg:col-span-2 space-y-8">
+              {/* Upcoming Sessions */}
+              <Card className="border-border bg-card/40 backdrop-blur-xl rounded-[2.5rem] shadow-xl overflow-hidden">
+                <CardHeader className="flex flex-row items-center justify-between p-8 pb-4">
+                  <div>
+                    <CardTitle className="text-2xl font-black tracking-tight">Upcoming Sessions</CardTitle>
+                    <CardDescription>Your scheduled knowledge transfers</CardDescription>
+                  </div>
                   <Link href="/sessions">
-                    <Button variant="ghost" size="sm">
-                      View All
-                      <ArrowRight className="ml-2 w-4 h-4" />
+                    <Button variant="ghost" size="sm" className="rounded-xl">
+                      View Timeline
                     </Button>
                   </Link>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-8 pt-4">
                   {upcomingSessions.length === 0 ? (
-                    <div className="text-center py-8">
-                      <Calendar className="w-12 h-12 mx-auto text-muted-foreground/50 mb-4" />
-                      <p className="text-muted-foreground mb-4">No upcoming sessions</p>
+                    <div className="text-center py-20 bg-muted/20 rounded-[2rem] border border-dashed border-border">
+                      <Calendar className="w-16 h-16 mx-auto text-muted-foreground/20 mb-6" />
+                      <p className="text-xl font-bold text-muted-foreground mb-6">No active sessions indexed</p>
                       <Link href="/explore">
-                        <Button variant="outline">
-                          <Plus className="w-4 h-4 mr-2" />
-                          Book a Session
+                        <Button variant="outline" className="rounded-xl px-8 h-12 font-bold">
+                          Begin Discovery
                         </Button>
                       </Link>
                     </div>
@@ -182,25 +214,27 @@ export function DashboardContent() {
                       {upcomingSessions.map((session) => (
                         <div 
                           key={session.id} 
-                          className="flex items-center gap-4 p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                          className="flex items-center gap-6 p-6 rounded-[2rem] bg-background/50 border border-border hover:border-primary/30 transition-all group"
                         >
-                          <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                            <BookOpen className="w-6 h-6 text-emerald-400" />
+                          <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <BookOpen className="w-7 h-7 text-primary" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium truncate">{session.title}</p>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <Clock className="w-4 h-4" />
-                              {new Date(session.scheduled_at).toLocaleDateString('en-IN', {
-                                weekday: 'short',
-                                month: 'short',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
+                            <p className="text-lg font-black truncate group-hover:text-primary transition-colors">{session.title}</p>
+                            <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
+                              <Clock className="w-4 h-4 text-primary" />
+                              <span className="font-bold">
+                                {new Date(session.scheduled_at).toLocaleDateString('en-IN', {
+                                  weekday: 'short',
+                                  month: 'short',
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </span>
                             </div>
                           </div>
-                          <Badge variant={session.status === 'confirmed' ? 'default' : 'secondary'}>
+                          <Badge className="bg-primary/10 text-primary border-primary/20 font-black uppercase tracking-widest text-[10px] py-1 px-3">
                             {session.status}
                           </Badge>
                         </div>
@@ -210,110 +244,114 @@ export function DashboardContent() {
                 </CardContent>
               </Card>
 
-              <Card className="border-border bg-card">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-lg">Your Skills</CardTitle>
-                  <Link href="/profile">
-                    <Button variant="ghost" size="sm">
-                      Manage
-                      <ArrowRight className="ml-2 w-4 h-4" />
-                    </Button>
-                  </Link>
-                </CardHeader>
-                <CardContent>
-                  {skills.length === 0 ? (
-                    <div className="text-center py-8">
-                      <BookOpen className="w-12 h-12 mx-auto text-muted-foreground/50 mb-4" />
-                      <p className="text-muted-foreground mb-4">No skills added yet</p>
-                      <Link href="/profile">
-                        <Button variant="outline">
-                          <Plus className="w-4 h-4 mr-2" />
-                          Add Skills
-                        </Button>
-                      </Link>
+              {/* Skills Area */}
+              <div className="grid md:grid-cols-2 gap-8">
+                <Card className="border-border bg-card/40 backdrop-blur-xl rounded-[2.5rem] shadow-xl">
+                  <CardHeader className="p-8 pb-4">
+                    <CardTitle className="text-xl font-black flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                        <Award className="w-5 h-5 text-blue-500" />
+                      </div>
+                      Teaching
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-8 pt-4">
+                    <div className="flex flex-wrap gap-2">
+                      {teachingSkills.map((us) => (
+                        <Badge key={us.id} className="bg-blue-500/10 text-blue-500 border-blue-500/20 py-1 px-3 rounded-xl font-bold">
+                          {us.skill?.name}
+                        </Badge>
+                      ))}
+                      {teachingSkills.length === 0 && <p className="text-sm text-muted-foreground italic">None indexed</p>}
                     </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {teachingSkills.length > 0 && (
-                        <div>
-                          <p className="text-sm text-muted-foreground mb-2">Teaching</p>
-                          <div className="flex flex-wrap gap-2">
-                            {teachingSkills.map((us) => (
-                              <Badge key={us.id} className="bg-emerald-500/20 text-emerald-400 border-emerald-500/50">
-                                {us.skill?.name}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      {learningSkills.length > 0 && (
-                        <div>
-                          <p className="text-sm text-muted-foreground mb-2">Learning</p>
-                          <div className="flex flex-wrap gap-2">
-                            {learningSkills.map((us) => (
-                              <Badge key={us.id} variant="secondary">
-                                {us.skill?.name}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                  </CardContent>
+                </Card>
+
+                <Card className="border-border bg-card/40 backdrop-blur-xl rounded-[2.5rem] shadow-xl">
+                  <CardHeader className="p-8 pb-4">
+                    <CardTitle className="text-xl font-black flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center">
+                        <TrendingUp className="w-5 h-5 text-violet-500" />
+                      </div>
+                      Learning
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-8 pt-4">
+                    <div className="flex flex-wrap gap-2">
+                      {learningSkills.map((us) => (
+                        <Badge key={us.id} className="bg-violet-500/10 text-violet-500 border-violet-500/20 py-1 px-3 rounded-xl font-bold">
+                          {us.skill?.name}
+                        </Badge>
+                      ))}
+                      {learningSkills.length === 0 && <p className="text-sm text-muted-foreground italic">None defined</p>}
                     </div>
-                  )}
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
 
-            <div className="space-y-6">
-              <Card className="border-border bg-card">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Quick Actions</CardTitle>
+            {/* Sidebar Actions */}
+            <div className="space-y-8">
+              <Card className="border-border bg-card/40 backdrop-blur-xl rounded-[2.5rem] shadow-xl p-2 overflow-hidden">
+                <CardHeader className="p-6">
+                  <CardTitle className="text-xl font-black">Fast Operations</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2">
-                  <Link href="/explore" className="block">
-                    <Button variant="outline" className="w-full justify-start">
-                      <Users className="w-4 h-4 mr-2" />
+                <CardContent className="p-6 pt-0 space-y-3">
+                  <Link href="/mentors" className="block">
+                    <Button variant="outline" className="w-full h-14 justify-start rounded-2xl border-border bg-background hover:bg-primary hover:text-white hover:border-primary transition-all font-bold">
+                      <Users className="w-5 h-5 mr-4" />
                       Find Mentors
                     </Button>
                   </Link>
                   <Link href="/sessions/new" className="block">
-                    <Button variant="outline" className="w-full justify-start">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      Schedule Session
+                    <Button variant="outline" className="w-full h-14 justify-start rounded-2xl border-border bg-background hover:bg-primary hover:text-white hover:border-primary transition-all font-bold">
+                      <Zap className="w-5 h-5 mr-4" />
+                      Instant Booking
                     </Button>
                   </Link>
                   <Link href="/messages" className="block">
-                    <Button variant="outline" className="w-full justify-start">
-                      <MessageSquare className="w-4 h-4 mr-2" />
-                      Messages
+                    <Button variant="outline" className="w-full h-14 justify-start rounded-2xl border-border bg-background hover:bg-primary hover:text-white hover:border-primary transition-all font-bold">
+                      <MessageSquare className="w-5 h-5 mr-4" />
+                      Terminal Sync
                     </Button>
                   </Link>
                 </CardContent>
               </Card>
 
-              <Card className="border-border bg-card">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Notifications</CardTitle>
+              <Card className="border-border bg-card/40 backdrop-blur-xl rounded-[2.5rem] shadow-xl p-2 overflow-hidden">
+                <CardHeader className="p-6">
+                  <CardTitle className="text-xl font-black">Signal Queue</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-6 pt-0">
                   {notifications.length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-4">
-                      No new notifications
-                    </p>
+                    <div className="text-center py-10 opacity-40 italic text-sm">
+                      Queue clear. No pending signals.
+                    </div>
                   ) : (
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       {notifications.map((notif) => (
-                        <div key={notif.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/30">
-                          <div className="w-2 h-2 mt-2 rounded-full bg-emerald-400" />
+                        <div key={notif.id} className="flex items-start gap-4 p-4 rounded-2xl bg-background/50 border border-border group hover:border-primary/20 transition-all">
+                          <div className="w-2.5 h-2.5 mt-2 rounded-full bg-primary animate-pulse shadow-lg shadow-primary/50" />
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium">{notif.title}</p>
-                            <p className="text-xs text-muted-foreground truncate">{notif.message}</p>
+                            <p className="text-sm font-black group-hover:text-primary transition-colors">{notif.title}</p>
+                            <p className="text-xs text-muted-foreground truncate font-medium">{notif.message}</p>
                           </div>
                         </div>
                       ))}
                     </div>
                   )}
                 </CardContent>
+              </Card>
+
+              <Card className="border-primary/20 bg-primary/5 rounded-[2.5rem] shadow-xl p-8 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <ShieldCheck className="w-20 h-20" />
+                </div>
+                <h3 className="text-xl font-black mb-2">Verified Growth</h3>
+                <p className="text-sm text-muted-foreground mb-6">Your trust score is in the top 5% for the {profile?.city || 'local'} area. Keep it up!</p>
+                <Button className="w-full bg-primary text-white rounded-xl font-bold h-12 shadow-lg shadow-primary/20">
+                  Boost Reputation
+                </Button>
               </Card>
             </div>
           </div>

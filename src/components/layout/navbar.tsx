@@ -8,6 +8,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Sparkles, Menu, X, User, Settings, LogOut, LayoutDashboard, MessageSquare, Calendar, Search } from 'lucide-react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { ThemeToggle } from './theme-toggle'
 
 export function Navbar() {
   const { user, profile, loading, signOut } = useAuth()
@@ -20,8 +21,8 @@ export function Navbar() {
   }
 
   const navLinks = [
-    { href: '/explore', label: 'Explore Skills', icon: Search },
-    { href: '/mentors', label: 'Find Mentors', icon: User },
+    { href: '/explore', label: 'Explore', icon: Search },
+    { href: '/mentors', label: 'Mentors', icon: User },
   ]
 
   const authLinks = [
@@ -35,11 +36,11 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-lg flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-slate-900" />
+            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+              <Sparkles className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-              SkillShare
+            <span className="text-xl font-bold tracking-tight">
+              SkillShare<span className="text-primary">.</span>
             </span>
           </Link>
 
@@ -55,7 +56,7 @@ export function Navbar() {
             {user && authLinks.map((link) => (
               <Link key={link.href} href={link.href}>
                 <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
-                  <link.icon className="w-4 h-4 mr-2" />
+                  <link.icon className="w-4 h-4 mr-2 text-primary" />
                   {link.label}
                 </Button>
               </Link>
@@ -63,15 +64,16 @@ export function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
+            <ThemeToggle />
             {loading ? (
               <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
             ) : user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                    <Avatar className="h-10 w-10 border-2 border-emerald-500/50">
+                    <Avatar className="h-10 w-10 border-2 border-primary/50">
                       <AvatarImage src={profile?.avatar_url || ''} />
-                      <AvatarFallback className="bg-emerald-500/20 text-emerald-400">
+                      <AvatarFallback className="bg-primary/20 text-primary">
                         {profile?.full_name?.charAt(0) || 'U'}
                       </AvatarFallback>
                     </Avatar>
@@ -108,7 +110,7 @@ export function Navbar() {
                   <Button variant="ghost">Sign In</Button>
                 </Link>
                 <Link href="/register">
-                  <Button className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white">
+                  <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/10">
                     Get Started
                   </Button>
                 </Link>
@@ -116,14 +118,16 @@ export function Navbar() {
             )}
           </div>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </Button>
+          <div className="md:hidden flex items-center gap-2">
+            <ThemeToggle />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -144,7 +148,7 @@ export function Navbar() {
                 {authLinks.map((link) => (
                   <Link key={link.href} href={link.href} onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="ghost" className="w-full justify-start">
-                      <link.icon className="w-4 h-4 mr-2" />
+                      <link.icon className="w-4 h-4 mr-2 text-primary" />
                       {link.label}
                     </Button>
                   </Link>
@@ -164,7 +168,7 @@ export function Navbar() {
                   <Button variant="outline" className="w-full">Sign In</Button>
                 </Link>
                 <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500">Get Started</Button>
+                  <Button className="w-full bg-primary text-primary-foreground">Get Started</Button>
                 </Link>
               </div>
             )}

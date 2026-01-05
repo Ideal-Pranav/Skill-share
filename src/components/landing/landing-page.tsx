@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -9,145 +9,202 @@ import { Navbar } from '@/components/layout/navbar'
 import { 
   Sparkles, ArrowRight, Users, BookOpen, Award, MapPin, 
   Code, Palette, Briefcase, Globe, GraduationCap, Heart,
-  Star, CheckCircle2, Zap
+  Star, CheckCircle2, Zap, Layout, ShieldCheck, ZapOff,
+  CloudLightning, MousePointer2
 } from 'lucide-react'
+import { useRef } from 'react'
 
 const categories = [
-  { name: 'Technology', icon: Code, color: 'from-blue-500 to-cyan-500', skills: 8 },
-  { name: 'Creative Arts', icon: Palette, color: 'from-pink-500 to-rose-500', skills: 5 },
-  { name: 'Business', icon: Briefcase, color: 'from-amber-500 to-orange-500', skills: 5 },
-  { name: 'Languages', icon: Globe, color: 'from-emerald-500 to-teal-500', skills: 5 },
-  { name: 'Academic', icon: GraduationCap, color: 'from-violet-500 to-purple-500', skills: 5 },
-  { name: 'Lifestyle', icon: Heart, color: 'from-red-500 to-pink-500', skills: 4 },
+  { name: 'Technology', icon: Code, color: 'from-indigo-500 to-blue-500', skills: 850 },
+  { name: 'Creative Arts', icon: Palette, color: 'from-violet-500 to-purple-500', skills: 420 },
+  { name: 'Business', icon: Briefcase, color: 'from-blue-500 to-indigo-500', skills: 310 },
+  { name: 'Languages', icon: Globe, color: 'from-sky-500 to-indigo-500', skills: 240 },
+  { name: 'Academic', icon: GraduationCap, color: 'from-indigo-600 to-violet-600', skills: 560 },
+  { name: 'Lifestyle', icon: Heart, color: 'from-violet-400 to-indigo-400', skills: 180 },
 ]
 
 const features = [
   {
-    icon: Users,
-    title: 'Local Community',
-    description: 'Connect with mentors and learners in Nashik. Build meaningful relationships that go beyond the screen.',
+    icon: Globe,
+    title: 'Global Reach, Local Depth',
+    description: 'Filter mentors by country, state, or city to find the perfect cultural and geographic match for your learning journey.',
   },
   {
-    icon: BookOpen,
-    title: 'Skill Exchange',
-    description: 'Teach what you know, learn what you don\'t. Every skill has value in our community.',
+    icon: ShieldCheck,
+    title: 'Verified Expertise',
+    description: 'Every mentor goes through a rigorous verification process to ensure high-quality, authentic educational experiences.',
   },
   {
-    icon: Award,
-    title: 'Trust & Reputation',
-    description: 'Build your reputation through verified sessions and honest reviews from real learners.',
+    icon: CloudLightning,
+    title: 'Real-time Sync',
+    description: 'Experience seamless scheduling and real-time communication across all your devices, anytime, anywhere.',
   },
   {
-    icon: MapPin,
-    title: 'Meet In Person',
-    description: 'Schedule sessions online or meet in person at local cafes, libraries, or co-working spaces.',
+    icon: Layout,
+    title: 'Personalized Paths',
+    description: 'Our intelligent matching system suggests learning paths based on your goals, location, and existing skill matrix.',
   },
-]
-
-const stats = [
-  { value: '36+', label: 'Skills Available' },
-  { value: '7', label: 'Categories' },
-  { value: 'Nashik', label: 'Starting City' },
-  { value: 'Free', label: 'To Join' },
 ]
 
 export function LandingPage() {
+  const containerRef = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  })
+
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, -200])
+  const y2 = useTransform(scrollYProgress, [0, 1], [0, -500])
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background selection:bg-primary/30" ref={containerRef}>
       <Navbar />
       
-      <section className="relative pt-32 pb-20 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-900/20 via-background to-background" />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMjIiIGZpbGwtb3BhY2l0eT0iMC4wNCI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute top-1/4 -left-20 w-96 h-96 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
+          <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-violet-500/10 rounded-full blur-[100px] animate-pulse delay-700" />
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none" />
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center max-w-4xl mx-auto"
+            transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <Badge variant="outline" className="mb-6 border-emerald-500/50 text-emerald-400">
-              <Sparkles className="w-3 h-3 mr-1" />
-              Now live in Nashik
+            <Badge variant="outline" className="mb-8 px-4 py-1 border-primary/20 bg-primary/5 text-primary backdrop-blur-sm animate-bounce-slow">
+              <Sparkles className="w-3.5 h-3.5 mr-2" />
+              Revolutionizing Global Mentorship
             </Badge>
             
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
-              Learn from{' '}
-              <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
-                Local Experts
+            <h1 className="text-6xl md:text-8xl font-bold tracking-tight mb-8 leading-[1.1]">
+              Master Any Skill with<br />
+              <span className="bg-gradient-to-r from-primary via-violet-500 to-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient-x">
+                World-Class Mentors
               </span>
             </h1>
             
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Connect with skilled mentors in your community. Whether you want to learn coding, 
-              master a new language, or pick up a creative skill — find the perfect guide nearby.
+            <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
+              The premium skill-sharing ecosystem that connects ambitious learners with 
+              industry experts across 150+ countries. Experience mentorship redefined.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <Link href="/register">
-                <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white px-8 h-12 text-lg">
-                  Start Learning
-                  <ArrowRight className="ml-2 w-5 h-5" />
+                <Button size="lg" className="h-14 px-10 text-lg bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-2xl shadow-primary/20 group transition-all duration-300 hover:scale-105">
+                  Begin Your Journey
+                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
               <Link href="/explore">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto h-12 text-lg">
-                  Explore Skills
+                <Button size="lg" variant="outline" className="h-14 px-10 text-lg border-border bg-background/50 backdrop-blur-md hover:bg-accent rounded-2xl transition-all duration-300">
+                  Explore Programs
                 </Button>
               </Link>
             </div>
           </motion.div>
 
-          <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8"
+          {/* Floating 3D-like Dashboard Preview */}
+          <motion.div
+            style={{ y: y1 }}
+            className="mt-24 relative max-w-5xl mx-auto"
+            initial={{ opacity: 0, scale: 0.9, rotateX: 20 }}
+            animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+            transition={{ duration: 1, delay: 0.2 }}
           >
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-                  {stat.value}
+            <div className="relative rounded-3xl overflow-hidden border border-border shadow-[0_0_50px_-12px_rgba(0,0,0,0.3)] dark:shadow-[0_0_50px_-12px_rgba(255,255,255,0.05)] bg-card/50 backdrop-blur-2xl">
+              <div className="h-12 bg-muted/30 border-b border-border flex items-center px-6 gap-2">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/30" />
+                  <div className="w-3 h-3 rounded-full bg-amber-500/20 border border-amber-500/30" />
+                  <div className="w-3 h-3 rounded-full bg-emerald-500/20 border border-emerald-500/30" />
                 </div>
-                <div className="text-sm text-muted-foreground mt-1">{stat.label}</div>
+                <div className="ml-4 h-6 w-64 bg-background/50 rounded-md border border-border flex items-center px-3 text-[10px] text-muted-foreground">
+                  skillshare.global/dashboard
+                </div>
               </div>
-            ))}
+              <div className="p-8 aspect-video flex items-center justify-center bg-gradient-to-br from-primary/5 via-transparent to-violet-500/5">
+                <div className="grid grid-cols-3 gap-6 w-full max-w-3xl">
+                  <div className="h-40 rounded-2xl bg-background/80 border border-border p-4 shadow-xl">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 mb-4" />
+                    <div className="h-2 w-2/3 bg-muted rounded mb-2" />
+                    <div className="h-2 w-1/2 bg-muted/50 rounded" />
+                  </div>
+                  <div className="h-40 rounded-2xl bg-background/80 border border-border p-4 shadow-xl translate-y-8">
+                    <div className="w-10 h-10 rounded-lg bg-violet-500/10 mb-4" />
+                    <div className="h-2 w-2/3 bg-muted rounded mb-2" />
+                    <div className="h-2 w-1/2 bg-muted/50 rounded" />
+                  </div>
+                  <div className="h-40 rounded-2xl bg-background/80 border border-border p-4 shadow-xl">
+                    <div className="w-10 h-10 rounded-lg bg-blue-500/10 mb-4" />
+                    <div className="h-2 w-2/3 bg-muted rounded mb-2" />
+                    <div className="h-2 w-1/2 bg-muted/50 rounded" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Floating Elements */}
+            <motion.div 
+              animate={{ y: [0, -20, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute -top-12 -right-12 w-32 h-32 bg-primary/20 rounded-3xl blur-2xl" 
+            />
+            <motion.div 
+              animate={{ y: [0, 20, 0] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+              className="absolute -bottom-12 -left-12 w-40 h-40 bg-violet-500/20 rounded-3xl blur-2xl" 
+            />
           </motion.div>
         </div>
       </section>
 
-      <section className="py-20 bg-card/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Categories Grid */}
+      <section className="py-32 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-12"
+            className="text-center mb-20"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Explore Skill Categories</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Browse through diverse categories and find the perfect skill to learn or teach
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">World-Class Skill Matrix</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              Curated learning paths across every major industry. Verified mentors, 
+              guaranteed growth.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {categories.map((category, index) => (
               <motion.div
                 key={category.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                whileHover={{ y: -10 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
               >
                 <Link href={`/explore?category=${category.name.toLowerCase()}`}>
-                  <Card className="group cursor-pointer border-border hover:border-emerald-500/50 transition-all duration-300 bg-card hover:bg-card/80">
-                    <CardContent className="p-6 text-center">
-                      <div className={`w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br ${category.color} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                        <category.icon className="w-6 h-6 text-white" />
+                  <Card className="group cursor-pointer border-border bg-card/40 backdrop-blur-sm hover:bg-card hover:border-primary/50 transition-all duration-500 rounded-[2.5rem] p-4 overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-primary/10">
+                    <CardContent className="p-8 flex items-center gap-6">
+                      <div className={`w-20 h-20 rounded-[2rem] bg-gradient-to-br ${category.color} flex items-center justify-center group-hover:rotate-[15deg] transition-all duration-500 shadow-xl shadow-primary/10`}>
+                        <category.icon className="w-10 h-10 text-white" />
                       </div>
-                      <h3 className="font-semibold text-sm">{category.name}</h3>
-                      <p className="text-xs text-muted-foreground mt-1">{category.skills} skills</p>
+                      <div className="flex-1">
+                        <h3 className="text-2xl font-bold mb-1 group-hover:text-primary transition-colors">{category.name}</h3>
+                        <div className="flex items-center text-muted-foreground">
+                          <span className="text-lg font-medium text-foreground">{category.skills}</span>
+                          <span className="mx-2">•</span>
+                          <span className="text-sm uppercase tracking-wider">Expert Mentors</span>
+                        </div>
+                      </div>
+                      <div className="w-10 h-10 rounded-full border border-border flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0">
+                        <ArrowRight className="w-5 h-5" />
+                      </div>
                     </CardContent>
                   </Card>
                 </Link>
@@ -157,180 +214,180 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Why SkillShare Nashik?</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              We&apos;re building a community where knowledge flows freely between neighbors
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, index) => (
+      {/* Premium Features */}
+      <section className="py-32 bg-primary/[0.02] border-y border-border relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] -mr-96 -mt-96" />
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-20 items-center">
+            <div>
               <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
               >
-                <Card className="h-full border-border bg-card/50 hover:bg-card transition-colors">
-                  <CardContent className="p-6">
-                    <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center mb-4">
-                      <feature.icon className="w-6 h-6 text-emerald-400" />
-                    </div>
-                    <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
-                    <p className="text-sm text-muted-foreground">{feature.description}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+                <Badge className="bg-primary/10 text-primary border-primary/20 mb-6 uppercase tracking-[0.2em] text-[10px] py-1 px-4">
+                  The Ecosystem
+                </Badge>
+                <h2 className="text-5xl md:text-6xl font-bold mb-8 leading-tight">
+                  Engineered for<br />
+                  <span className="text-primary">Global Excellence</span>
+                </h2>
+                <p className="text-xl text-muted-foreground mb-12 leading-relaxed">
+                  We&apos;ve built more than just a platform. SkillShare is a high-performance 
+                  learning engine designed to remove barriers between curiosity and mastery.
+                </p>
 
-      <section className="py-20 bg-gradient-to-b from-card/50 to-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+                <div className="grid sm:grid-cols-2 gap-8">
+                  {features.map((feature, idx) => (
+                    <motion.div 
+                      key={feature.title}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: idx * 0.1 }}
+                      className="group"
+                    >
+                      <div className="w-14 h-14 rounded-2xl bg-card border border-border flex items-center justify-center mb-6 group-hover:bg-primary group-hover:border-primary transition-all duration-300 shadow-lg group-hover:shadow-primary/20">
+                        <feature.icon className="w-7 h-7 text-primary group-hover:text-white transition-colors" />
+                      </div>
+                      <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
+                      <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+              style={{ y: y2 }}
+              className="relative hidden lg:block"
             >
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                How It Works
-              </h2>
-              
-              <div className="space-y-6">
-                {[
-                  { step: '01', title: 'Create Your Profile', desc: 'Sign up and tell us about your skills and what you want to learn' },
-                  { step: '02', title: 'Find Your Match', desc: 'Browse mentors or learners based on skills, location, and availability' },
-                  { step: '03', title: 'Book a Session', desc: 'Schedule a time that works for both of you — online or in person' },
-                  { step: '04', title: 'Learn & Grow', desc: 'Complete sessions, leave reviews, and build your reputation' },
-                ].map((item, index) => (
-                  <motion.div 
-                    key={item.step}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className="flex gap-4"
-                  >
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-white font-bold">
-                      {item.step}
+              <div className="relative rounded-[3rem] overflow-hidden border border-border shadow-3xl aspect-[4/5] bg-card p-2">
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-violet-500/10" />
+                <div className="h-full w-full rounded-[2.5rem] bg-[url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2071&auto=format&fit=crop')] bg-cover bg-center grayscale hover:grayscale-0 transition-all duration-700" />
+                
+                {/* Overlay UI elements */}
+                <div className="absolute top-10 left-10 p-6 bg-background/80 backdrop-blur-xl rounded-3xl border border-border shadow-2xl w-64">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                      <ShieldCheck className="w-5 h-5 text-emerald-500" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-lg">{item.title}</h3>
-                      <p className="text-muted-foreground">{item.desc}</p>
+                      <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Verification</div>
+                      <div className="text-sm font-bold">Expert Approved</div>
                     </div>
-                  </motion.div>
-                ))}
+                  </div>
+                  <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
+                    <motion.div 
+                      initial={{ width: 0 }}
+                      whileInView={{ width: "100%" }}
+                      transition={{ duration: 1, delay: 0.5 }}
+                      className="h-full bg-emerald-500" 
+                    />
+                  </div>
+                </div>
+
+                <div className="absolute bottom-10 right-10 p-6 bg-primary backdrop-blur-xl rounded-3xl shadow-2xl w-64 text-white">
+                  <div className="text-3xl font-bold mb-2">15,000+</div>
+                  <div className="text-xs uppercase tracking-[0.2em] opacity-80">Mentorship Sessions Completed</div>
+                  <div className="mt-4 flex -space-x-3">
+                    {[1,2,3,4].map(i => (
+                      <div key={i} className="w-8 h-8 rounded-full border-2 border-primary bg-muted" />
+                    ))}
+                    <div className="w-8 h-8 rounded-full border-2 border-primary bg-violet-400 flex items-center justify-center text-[10px] font-bold">+12k</div>
+                  </div>
+                </div>
               </div>
             </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="relative"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 rounded-3xl blur-3xl" />
-              <Card className="relative border-border bg-card">
-                <CardContent className="p-8">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center text-2xl font-bold text-slate-900">
-                      P
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-lg">Priya Sharma</h4>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <MapPin className="w-4 h-4" />
-                        Nashik, Maharashtra
-                      </div>
-                    </div>
-                    <Badge className="ml-auto bg-emerald-500/20 text-emerald-400 border-emerald-500/50">
-                      <CheckCircle2 className="w-3 h-3 mr-1" />
-                      Verified
-                    </Badge>
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    <Badge variant="secondary">React.js</Badge>
-                    <Badge variant="secondary">JavaScript</Badge>
-                    <Badge variant="secondary">Web Dev</Badge>
-                  </div>
-                  
-                  <p className="text-muted-foreground mb-6">
-                    &quot;Teaching web development to beginners for 3 years. I believe in learning by building real projects together.&quot;
-                  </p>
-                  
-                  <div className="flex items-center justify-between pt-4 border-t border-border">
-                    <div className="flex items-center gap-1">
-                      <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
-                      <span className="font-semibold">4.9</span>
-                      <span className="text-muted-foreground">(24 reviews)</span>
-                    </div>
-                    <Button className="bg-gradient-to-r from-emerald-500 to-cyan-500">
-                      <Zap className="w-4 h-4 mr-2" />
-                      Book Session
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
           </div>
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      {/* CTA Section */}
+      <section className="py-32 relative overflow-hidden">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            className="bg-card border border-border rounded-[4rem] p-12 md:p-24 relative overflow-hidden shadow-2xl"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Ready to Start Your Journey?
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-violet-500/5" />
+            
+            <h2 className="text-5xl md:text-7xl font-bold mb-8 relative z-10">
+              Your Evolution<br />
+              <span className="text-primary">Starts Here.</span>
             </h2>
-            <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join hundreds of learners and mentors in Nashik. Whether you want to pick up a new skill 
-              or share your expertise, there&apos;s a place for you here.
+            <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto relative z-10 leading-relaxed">
+              Join the elite circle of global learners and mentors. Scalable, secure, 
+              and designed for the high-achievers of tomorrow.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center relative z-10">
               <Link href="/register">
-                <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white px-8 h-12 text-lg">
-                  Create Free Account
-                  <ArrowRight className="ml-2 w-5 h-5" />
+                <Button size="lg" className="h-16 px-12 text-xl bg-primary text-primary-foreground hover:bg-primary/90 rounded-[2rem] shadow-xl shadow-primary/20">
+                  Join the Community
                 </Button>
               </Link>
               <Link href="/mentors">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto h-12 text-lg">
-                  Browse Mentors
+                <Button size="lg" variant="outline" className="h-16 px-12 text-xl border-border bg-background/50 backdrop-blur-md rounded-[2rem]">
+                  Meet the Mentors
                 </Button>
               </Link>
+            </div>
+            
+            <div className="mt-16 pt-16 border-t border-border/50 flex flex-wrap justify-center gap-12 grayscale opacity-40">
+              <span className="text-2xl font-black">NASHIK.NY</span>
+              <span className="text-2xl font-black">BERLIN.EDU</span>
+              <span className="text-2xl font-black">LONDON.LAB</span>
+              <span className="text-2xl font-black">TOKYO.TEC</span>
             </div>
           </motion.div>
         </div>
       </section>
 
-      <footer className="py-12 border-t border-border">
+      {/* Footer */}
+      <footer className="py-20 border-t border-border bg-card/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-lg flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-slate-900" />
-              </div>
-              <span className="font-semibold">SkillShare Nashik</span>
+          <div className="grid md:grid-cols-4 gap-12 mb-20">
+            <div className="col-span-2">
+              <Link href="/" className="flex items-center gap-3 mb-8">
+                <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20">
+                  <Sparkles className="w-7 h-7 text-primary-foreground" />
+                </div>
+                <span className="text-2xl font-black tracking-tighter">SkillShare.</span>
+              </Link>
+              <p className="text-muted-foreground text-lg max-w-md leading-relaxed">
+                Empowering the world through knowledge exchange. Premium mentorship for 
+                the digital age, focused on community, trust, and global growth.
+              </p>
             </div>
-            <p className="text-sm text-muted-foreground">
-              Building a community of learners and teachers in Nashik.
-            </p>
+            <div>
+              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-primary">Platform</h4>
+              <ul className="space-y-4 text-muted-foreground">
+                <li><Link href="/explore" className="hover:text-primary transition-colors">Explore Matrix</Link></li>
+                <li><Link href="/mentors" className="hover:text-primary transition-colors">Expert Mentors</Link></li>
+                <li><Link href="/curriculum" className="hover:text-primary transition-colors">Curriculum</Link></li>
+                <li><Link href="/enterprise" className="hover:text-primary transition-colors">Enterprise</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-primary">Community</h4>
+              <ul className="space-y-4 text-muted-foreground">
+                <li><Link href="/about" className="hover:text-primary transition-colors">Our Story</Link></li>
+                <li><Link href="/safety" className="hover:text-primary transition-colors">Safety & Trust</Link></li>
+                <li><Link href="/cities" className="hover:text-primary transition-colors">Active Cities</Link></li>
+                <li><Link href="/blog" className="hover:text-primary transition-colors">Perspectives</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-12 border-t border-border/50 text-sm text-muted-foreground">
+            <p>© 2026 SkillShare Global. Built for the high-performance learners.</p>
+            <div className="flex gap-8 font-medium">
+              <Link href="/terms" className="hover:text-primary transition-colors">Terms of Excellence</Link>
+              <Link href="/privacy" className="hover:text-primary transition-colors">Privacy Charter</Link>
+              <Link href="/cookies" className="hover:text-primary transition-colors">Cookie Policy</Link>
+            </div>
           </div>
         </div>
       </footer>
