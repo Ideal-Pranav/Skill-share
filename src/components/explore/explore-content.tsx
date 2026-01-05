@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Search, Filter, Code, Palette, Briefcase, Globe, GraduationCap, Heart, Wrench, Star, Users, MapPin, Sparkles } from 'lucide-react'
+import { Search, Filter, Code, Palette, Briefcase, Globe, GraduationCap, Heart, Wrench, Star, Users, MapPin, Sparkles, ArrowRight } from 'lucide-react'
 import type { Skill, SkillCategory, UserSkill } from '@/lib/types/database'
 
 const categoryIcons: Record<string, React.ElementType> = {
