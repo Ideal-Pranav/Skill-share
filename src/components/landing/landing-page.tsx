@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Navbar } from '@/components/layout/navbar'
+import { LogoLoop } from '@/components/ui/logo-loop'
 import { 
   Sparkles, ArrowRight, Users, BookOpen, Award, MapPin, 
   Code, Palette, Briefcase, Globe, GraduationCap, Heart,
@@ -21,6 +22,15 @@ const categories = [
   { name: 'Languages', icon: Globe, color: 'from-sky-500 to-indigo-500', skills: 240 },
   { name: 'Academic', icon: GraduationCap, color: 'from-indigo-600 to-violet-600', skills: 560 },
   { name: 'Lifestyle', icon: Heart, color: 'from-violet-400 to-indigo-400', skills: 180 },
+]
+
+const partnerLogos = [
+  { src: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg', alt: 'Google' },
+  { src: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg', alt: 'Amazon' },
+  { src: 'https://upload.wikimedia.org/wikipedia/commons/9/96/Microsoft_logo_%282012%29.svg', alt: 'Microsoft' },
+  { src: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg', alt: 'Meta' },
+  { src: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg', alt: 'Netflix' },
+  { src: 'https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg', alt: 'Stripe' },
 ]
 
 const features = [
@@ -192,6 +202,26 @@ export function LandingPage() {
               className="absolute -bottom-12 -left-12 w-40 h-40 bg-violet-500/20 rounded-3xl blur-2xl" 
             />
           </motion.div>
+        </div>
+      </section>
+
+      {/* Trust Bar / Logo Loop */}
+      <section className="py-20 border-y border-border bg-card/10 overflow-hidden relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-transparent to-background z-10 pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 mb-12 text-center">
+          <p className="text-sm font-bold uppercase tracking-[0.3em] text-muted-foreground/60">
+            Empowering Teams At
+          </p>
+        </div>
+        <div className="relative">
+          <LogoLoop 
+            logos={partnerLogos} 
+            speed={40} 
+            gap={80} 
+            logoHeight={32}
+            className="opacity-50 hover:opacity-100 transition-opacity duration-500 grayscale hover:grayscale-0"
+            fadeOut={true}
+          />
         </div>
       </section>
 
