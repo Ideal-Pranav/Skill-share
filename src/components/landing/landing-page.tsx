@@ -8,13 +8,14 @@ import { Badge } from '@/components/ui/badge'
 import { Navbar } from '@/components/layout/navbar'
 import { LogoLoop } from '@/components/ui/logo-loop'
 import { 
-  Sparkles, ArrowRight, Users, BookOpen, Award, MapPin, 
-  Code, Palette, Briefcase, Globe, GraduationCap, Heart,
-  Star, CheckCircle2, Zap, Layout, ShieldCheck, ZapOff,
-  CloudLightning, MousePointer2
-} from 'lucide-react'
-import { useRef, useEffect } from 'react'
-
+    Sparkles, ArrowRight, Users, BookOpen, Award, MapPin, 
+    Code, Palette, Briefcase, Globe, GraduationCap, Heart,
+    Star, CheckCircle2, Zap, Layout, ShieldCheck, ZapOff,
+    CloudLightning, MousePointer2, Activity, MessageSquare,
+    Calendar, Settings, LogOut, BarChart3, Clock, PlayCircle
+  } from 'lucide-react'
+  import { useRef, useEffect, useState } from 'react'
+  
 const categories = [
   { name: 'Technology', icon: Code, color: 'from-indigo-500 to-blue-500', skills: 850 },
   { name: 'Creative Arts', icon: Palette, color: 'from-violet-500 to-purple-500', skills: 420 },
@@ -81,6 +82,29 @@ export function LandingPage() {
 
   const y1 = useTransform(scrollYProgress, [0, 1], [0, -200])
   const y2 = useTransform(scrollYProgress, [0, 1], [0, -500])
+
+  // Dashboard Tilt Effect
+  const rotateX = useMotionValue(0)
+  const rotateY = useMotionValue(0)
+  const springRotateX = useSpring(rotateX, { stiffness: 100, damping: 30 })
+  const springRotateY = useSpring(rotateY, { stiffness: 100, damping: 30 })
+
+  const handleDashboardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    const centerX = rect.width / 2
+    const centerY = rect.height / 2
+    
+    // Max rotation 5 degrees
+    rotateX.set((y - centerY) / -20)
+    rotateY.set((x - centerX) / 20)
+  }
+
+  const handleDashboardMouseLeave = () => {
+    rotateX.set(0)
+    rotateY.set(0)
+  }
 
   return (
     <div className="min-h-screen bg-background selection:bg-primary/30" ref={containerRef}>
@@ -152,13 +176,21 @@ export function LandingPage() {
 
           {/* Floating 3D-like Dashboard Preview */}
           <motion.div
-            style={{ y: y1 }}
-            className="mt-24 relative max-w-5xl mx-auto"
+            style={{ 
+              y: y1,
+              rotateX: springRotateX,
+              rotateY: springRotateY,
+              transformStyle: "preserve-3d",
+            }}
+            onMouseMove={handleDashboardMouseMove}
+            onMouseLeave={handleDashboardMouseLeave}
+            className="mt-24 relative max-w-5xl mx-auto cursor-default group/dashboard"
             initial={{ opacity: 0, scale: 0.9, rotateX: 20 }}
             animate={{ opacity: 1, scale: 1, rotateX: 0 }}
             transition={{ duration: 1, delay: 0.2 }}
           >
             <div className="relative rounded-3xl overflow-hidden border border-border shadow-[0_0_50px_-12px_rgba(0,0,0,0.3)] dark:shadow-[0_0_50px_-12px_rgba(255,255,255,0.05)] bg-card/50 backdrop-blur-2xl">
+              {/* Browser Header */}
               <div className="h-12 bg-muted/30 border-b border-border flex items-center px-6 gap-2">
                 <div className="flex gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/30" />
@@ -169,22 +201,126 @@ export function LandingPage() {
                   skillshare.global/dashboard
                 </div>
               </div>
-              <div className="p-8 aspect-video flex items-center justify-center bg-gradient-to-br from-primary/5 via-transparent to-violet-500/5">
-                <div className="grid grid-cols-3 gap-6 w-full max-w-3xl">
-                  <div className="h-40 rounded-2xl bg-background/80 border border-border p-4 shadow-xl">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 mb-4" />
-                    <div className="h-2 w-2/3 bg-muted rounded mb-2" />
-                    <div className="h-2 w-1/2 bg-muted/50 rounded" />
+
+              {/* Dashboard Layout */}
+              <div className="flex h-[500px] bg-gradient-to-br from-primary/5 via-transparent to-violet-500/5">
+                {/* Sidebar Mockup */}
+                <div className="w-16 border-r border-border bg-background/40 flex flex-col items-center py-6 gap-6">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <Layout className="w-5 h-5 text-primary" />
                   </div>
-                  <div className="h-40 rounded-2xl bg-background/80 border border-border p-4 shadow-xl translate-y-8">
-                    <div className="w-10 h-10 rounded-lg bg-violet-500/10 mb-4" />
-                    <div className="h-2 w-2/3 bg-muted rounded mb-2" />
-                    <div className="h-2 w-1/2 bg-muted/50 rounded" />
+                  <Users className="w-5 h-5 text-muted-foreground/50" />
+                  <MessageSquare className="w-5 h-5 text-muted-foreground/50" />
+                  <Calendar className="w-5 h-5 text-muted-foreground/50" />
+                  <BarChart3 className="w-5 h-5 text-muted-foreground/50" />
+                  <div className="mt-auto flex flex-col gap-6">
+                    <Settings className="w-5 h-5 text-muted-foreground/30" />
+                    <LogOut className="w-5 h-5 text-muted-foreground/30" />
                   </div>
-                  <div className="h-40 rounded-2xl bg-background/80 border border-border p-4 shadow-xl">
-                    <div className="w-10 h-10 rounded-lg bg-blue-500/10 mb-4" />
-                    <div className="h-2 w-2/3 bg-muted rounded mb-2" />
-                    <div className="h-2 w-1/2 bg-muted/50 rounded" />
+                </div>
+
+                {/* Main Content Mockup */}
+                <div className="flex-1 p-8 overflow-hidden">
+                  <div className="flex items-center justify-between mb-8">
+                    <div>
+                      <h3 className="text-xl font-bold">Good morning, Alex</h3>
+                      <p className="text-xs text-muted-foreground">You have 2 sessions scheduled for today</p>
+                    </div>
+                    <div className="flex -space-x-2">
+                      {[1, 2, 3].map(i => (
+                        <div key={i} className="w-8 h-8 rounded-full border-2 border-background bg-muted" />
+                      ))}
+                      <div className="w-8 h-8 rounded-full border-2 border-background bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">+8</div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-6">
+                    {/* Stats Card */}
+                    <motion.div 
+                      whileHover={{ y: -5, scale: 1.02 }}
+                      className="bg-background/80 border border-border rounded-2xl p-5 shadow-xl transition-all duration-300 hover:shadow-primary/5"
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center">
+                          <Clock className="w-4 h-4 text-indigo-500" />
+                        </div>
+                        <Badge variant="outline" className="text-[9px] py-0 h-4 border-indigo-500/20 text-indigo-500">+12%</Badge>
+                      </div>
+                      <div className="text-2xl font-bold">24.5h</div>
+                      <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Learning Time</div>
+                    </motion.div>
+
+                    {/* Active Session Card */}
+                    <motion.div 
+                      whileHover={{ y: -5, scale: 1.02 }}
+                      className="bg-background/80 border border-border rounded-2xl p-5 shadow-xl transition-all duration-300 hover:shadow-violet-500/5 relative overflow-hidden"
+                    >
+                      <div className="absolute top-0 left-0 w-1 h-full bg-violet-500" />
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center">
+                          <PlayCircle className="w-4 h-4 text-violet-500" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="text-[10px] font-bold truncate">UX Strategy</div>
+                          <div className="text-[9px] text-muted-foreground">with Sarah Drasner</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="h-1.5 flex-1 bg-muted rounded-full overflow-hidden">
+                          <motion.div 
+                            animate={{ width: ["40%", "85%", "60%"] }}
+                            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                            className="h-full bg-violet-500" 
+                          />
+                        </div>
+                        <span className="text-[9px] font-mono font-bold">85%</span>
+                      </div>
+                    </motion.div>
+
+                    {/* Expert Match Card */}
+                    <motion.div 
+                      whileHover={{ y: -5, scale: 1.02 }}
+                      className="bg-background/80 border border-border rounded-2xl p-5 shadow-xl transition-all duration-300 hover:shadow-primary/5"
+                    >
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
+                          <div className="w-full h-full bg-primary/20 animate-pulse" />
+                        </div>
+                        <div>
+                          <div className="text-[10px] font-bold">Dr. Elena K.</div>
+                          <div className="text-[9px] text-primary font-semibold">Perfect Match</div>
+                        </div>
+                      </div>
+                      <Button size="sm" className="w-full h-8 text-[10px] font-bold rounded-lg bg-primary hover:bg-primary/90">
+                        Connect Now
+                      </Button>
+                    </motion.div>
+                  </div>
+
+                  {/* Chart Mockup */}
+                  <div className="mt-8 bg-background/40 border border-border/50 rounded-2xl p-6 h-40">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="text-xs font-bold">Skill Acquisition Progress</div>
+                      <div className="flex gap-4">
+                        <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground">
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary" /> Technical
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground">
+                          <div className="w-1.5 h-1.5 rounded-full bg-violet-500" /> Creative
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-end justify-between h-16 gap-2">
+                      {[40, 70, 45, 90, 65, 80, 55, 75, 95, 60, 85, 50].map((h, i) => (
+                        <motion.div 
+                          key={i}
+                          initial={{ height: 0 }}
+                          whileInView={{ height: `${h}%` }}
+                          transition={{ duration: 1, delay: i * 0.05 }}
+                          className={`w-full rounded-t-sm ${i % 2 === 0 ? 'bg-primary/30' : 'bg-violet-500/30'}`}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
