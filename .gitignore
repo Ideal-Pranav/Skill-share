@@ -10,6 +10,14 @@
 !.yarn/releases
 !.yarn/versions
 
+# environment variables - NEVER commit real credentials
+.env
+.env.local
+.env.*.local
+.env.production.local
+.env.development.local
+.env.test.local
+
 # testing
 /coverage
 
