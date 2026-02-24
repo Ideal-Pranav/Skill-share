@@ -1,4 +1,4 @@
-# 🎓 Orchids Skill-Sharing Platform
+# 🎓 Skill-Sharing Platform
 
 A modern, full-featured skill-sharing application where users can connect, learn, and teach various skills. Built with cutting-edge web technologies for a seamless user experience.
 
