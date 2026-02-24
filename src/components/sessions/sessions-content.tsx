@@ -24,6 +24,7 @@ export function SessionsContent() {
   
   const [sessions, setSessions] = useState<Session[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -39,14 +40,27 @@ export function SessionsContent() {
   const fetchSessions = async () => {
     if (!user) return
 
-    const { data } = await supabase
-      .from('sessions')
-      .select('*, mentor:profiles!sessions_mentor_id_fkey(*), learner:profiles!sessions_learner_id_fkey(*), skill:skills(*)')
-      .or(`mentor_id.eq.${user.id},learner_id.eq.${user.id}`)
-      .order('scheduled_at', { ascending: false })
+    try {
+      setError(null)
+      const { data, error } = await supabase
+        .from('sessions')
+        .select('*, mentor:profiles!sessions_mentor_id_fkey(*), learner:profiles!sessions_learner_id_fkey(*), skill:skills(*)')
+        .or(`mentor_id.eq.${user.id},learner_id.eq.${user.id}`)
+        .order('scheduled_at', { ascending: false })
 
-    if (data) setSessions(data as Session[])
-    setLoading(false)
+      if (error) {
+        console.error('Sessions fetch error:', error)
+        setError(`Sessions error: ${error.message}`)
+      } else if (data) {
+        setSessions(data as Session[])
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      console.error('Sessions fetch error:', error)
+      setError(`Error loading sessions: ${errorMessage}`)
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (authLoading || loading) {
@@ -83,6 +97,11 @@ export function SessionsContent() {
       <Navbar />
       
       <main className="pt-20 px-4 pb-10">
+        {error && (
+          <div className="max-w-5xl mx-auto mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-600 font-semibold">
+            {error}
+          </div>
+        )}
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -91,7 +110,7 @@ export function SessionsContent() {
                 Manage your learning and teaching sessions
               </p>
             </div>
-            <Link href="/explore">
+            <Link href="/sessions/new">
               <Button className="bg-primary">
                 <Calendar className="w-4 h-4 mr-2" />
                 Book New Session

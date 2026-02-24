@@ -27,6 +27,7 @@ export function DashboardContent() {
   const [skills, setSkills] = useState<UserSkill[]>([])
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -42,31 +43,55 @@ export function DashboardContent() {
   const fetchDashboardData = async () => {
     if (!user) return
 
-    const [sessionsRes, skillsRes, notificationsRes] = await Promise.all([
-      supabase
-        .from('sessions')
-        .select('*, mentor:profiles!sessions_mentor_id_fkey(*), learner:profiles!sessions_learner_id_fkey(*), skill:skills(*)')
-        .or(`mentor_id.eq.${user.id},learner_id.eq.${user.id}`)
-        .order('scheduled_at', { ascending: true })
-        .limit(5),
-      supabase
-        .from('user_skills')
-        .select('*, skill:skills(*)')
-        .eq('user_id', user.id),
-      supabase
-        .from('notifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('is_read', false)
-        .order('created_at', { ascending: false })
-        .limit(5),
-    ])
+    try {
+      setError(null)
+      const [sessionsRes, skillsRes, notificationsRes] = await Promise.all([
+        supabase
+          .from('sessions')
+          .select('*, mentor:profiles!sessions_mentor_id_fkey(*), learner:profiles!sessions_learner_id_fkey(*), skill:skills(*)')
+          .or(`mentor_id.eq.${user.id},learner_id.eq.${user.id}`)
+          .order('scheduled_at', { ascending: true })
+          .limit(5),
+        supabase
+          .from('user_skills')
+          .select('*, skill:skills(*)')
+          .eq('user_id', user.id),
+        supabase
+          .from('notifications')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('is_read', false)
+          .order('created_at', { ascending: false })
+          .limit(5),
+      ])
 
-    if (sessionsRes.data) setSessions(sessionsRes.data as Session[])
-    if (skillsRes.data) setSkills(skillsRes.data as UserSkill[])
-    if (notificationsRes.data) setNotifications(notificationsRes.data as Notification[])
-    
-    setLoading(false)
+      if (sessionsRes.error) {
+        console.error('Dashboard sessions fetch error:', sessionsRes.error)
+        setError(`Sessions error: ${sessionsRes.error.message}`)
+      } else if (sessionsRes.data) {
+        setSessions(sessionsRes.data as Session[])
+      }
+
+      if (skillsRes.error) {
+        console.error('Dashboard skills fetch error:', skillsRes.error)
+        setError(`Skills error: ${skillsRes.error.message}`)
+      } else if (skillsRes.data) {
+        setSkills(skillsRes.data as UserSkill[])
+      }
+
+      if (notificationsRes.error) {
+        console.error('Dashboard notifications fetch error:', notificationsRes.error)
+        setError(`Notifications error: ${notificationsRes.error.message}`)
+      } else if (notificationsRes.data) {
+        setNotifications(notificationsRes.data as Notification[])
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      console.error('Dashboard fetch error:', error)
+      setError(`Error loading dashboard: ${errorMessage}`)
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (authLoading || loading) {
@@ -127,6 +152,11 @@ export function DashboardContent() {
       <Navbar />
       
       <main className="pt-24 px-4 pb-20">
+        {error && (
+          <div className="max-w-7xl mx-auto mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-600 font-semibold">
+            {error}
+          </div>
+        )}
         <div className="max-w-7xl mx-auto">
           {/* Dashboard Header */}
           <motion.div 
@@ -143,7 +173,7 @@ export function DashboardContent() {
                 Welcome, <span className="text-primary">{profile?.full_name?.split(' ')[0]}</span>
               </h1>
               <p className="text-xl text-muted-foreground mt-2">
-                Monitoring your {profile?.city || 'global'} learning ecosystem.
+                Monitoring your {profile?.location_city || 'global'} learning ecosystem.
               </p>
             </div>
             <div className="flex gap-3">
@@ -348,7 +378,7 @@ export function DashboardContent() {
                   <ShieldCheck className="w-20 h-20" />
                 </div>
                 <h3 className="text-xl font-black mb-2">Verified Growth</h3>
-                <p className="text-sm text-muted-foreground mb-6">Your trust score is in the top 5% for the {profile?.city || 'local'} area. Keep it up!</p>
+                <p className="text-sm text-muted-foreground mb-6">Your trust score is in the top 5% for the {profile?.location_city || 'local'} area. Keep it up!</p>
                 <Button className="w-full bg-primary text-white rounded-xl font-bold h-12 shadow-lg shadow-primary/20">
                   Boost Reputation
                 </Button>

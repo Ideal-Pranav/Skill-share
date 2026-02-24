@@ -33,6 +33,7 @@ export function MessagesContent() {
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -59,46 +60,69 @@ export function MessagesContent() {
   const fetchConversations = async () => {
     if (!user) return
 
-    const { data: convData } = await supabase
-      .from('conversations')
-      .select('*')
-      .or(`participant_1.eq.${user.id},participant_2.eq.${user.id}`)
-      .order('last_message_at', { ascending: false })
+    try {
+      setError(null)
+      const { data: convData, error: convError } = await supabase
+        .from('conversations')
+        .select('*')
+        .or(`participant_1.eq.${user.id},participant_2.eq.${user.id}`)
+        .order('last_message_at', { ascending: false })
 
-    if (convData) {
-      const conversationsWithDetails = await Promise.all(
-        convData.map(async (conv) => {
-          const otherUserId = conv.participant_1 === user.id ? conv.participant_2 : conv.participant_1
-          
-          const [profileRes, messagesRes, unreadRes] = await Promise.all([
-            supabase.from('profiles').select('*').eq('id', otherUserId).single(),
-            supabase
-              .from('messages')
-              .select('*')
-              .eq('conversation_id', conv.id)
-              .order('created_at', { ascending: false })
-              .limit(1),
-            supabase
-              .from('messages')
-              .select('id', { count: 'exact' })
-              .eq('conversation_id', conv.id)
-              .neq('sender_id', user.id)
-              .eq('is_read', false),
-          ])
+      if (convError) {
+        console.error('Conversations fetch error:', convError)
+        setError(`Conversations error: ${convError.message}`)
+        return
+      }
 
-          return {
-            ...conv,
-            otherUser: profileRes.data as Profile,
-            lastMessage: messagesRes.data?.[0] as Message,
-            unreadCount: unreadRes.count || 0,
-          } as ConversationWithDetails
-        })
-      )
-      
-      setConversations(conversationsWithDetails)
+      if (convData) {
+        const conversationsWithDetails = await Promise.all(
+          convData.map(async (conv) => {
+            const otherUserId = conv.participant_1 === user.id ? conv.participant_2 : conv.participant_1
+            
+            const [profileRes, messagesRes, unreadRes] = await Promise.all([
+              supabase.from('profiles').select('*').eq('id', otherUserId).single(),
+              supabase
+                .from('messages')
+                .select('*')
+                .eq('conversation_id', conv.id)
+                .order('created_at', { ascending: false })
+                .limit(1),
+              supabase
+                .from('messages')
+                .select('id', { count: 'exact' })
+                .eq('conversation_id', conv.id)
+                .neq('sender_id', user.id)
+                .eq('is_read', false),
+            ])
+
+            if (profileRes.error) {
+              console.error('Profile fetch error:', profileRes.error)
+            }
+            if (messagesRes.error) {
+              console.error('Messages fetch error:', messagesRes.error)
+            }
+            if (unreadRes.error) {
+              console.error('Unread count fetch error:', unreadRes.error)
+            }
+
+            return {
+              ...conv,
+              otherUser: profileRes.data as Profile,
+              lastMessage: messagesRes.data?.[0] as Message,
+              unreadCount: unreadRes.count || 0,
+            } as ConversationWithDetails
+          })
+        )
+        
+        setConversations(conversationsWithDetails)
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      console.error('Conversations fetch error:', error)
+      setError(`Error loading conversations: ${errorMessage}`)
+    } finally {
+      setLoading(false)
     }
-    
-    setLoading(false)
   }
 
   const startConversationWith = async (targetId: string) => {
@@ -222,6 +246,11 @@ export function MessagesContent() {
       <Navbar />
       
       <main className="pt-20 px-4 pb-10">
+        {error && (
+          <div className="max-w-6xl mx-auto mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-600 font-semibold">
+            {error}
+          </div>
+        )}
         <div className="max-w-6xl mx-auto">
           <Card className="border-border bg-card h-[calc(100vh-140px)]">
             <div className="flex h-full">

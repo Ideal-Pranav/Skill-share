@@ -30,7 +30,7 @@ export function OnboardingContent() {
   const [bio, setBio] = useState(profile?.bio || '')
   const [country, setCountry] = useState(profile?.country || '')
   const [state, setState] = useState(profile?.state || '')
-  const [city, setCity] = useState(profile?.city || '')
+  const [city, setCity] = useState(profile?.location_city || '')
   
   // Skill Data
   const [selectedTeachingSkills, setSelectedTeachingSkills] = useState<string[]>([])

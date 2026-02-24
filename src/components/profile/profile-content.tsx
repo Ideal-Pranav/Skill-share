@@ -20,7 +20,7 @@ import { toast } from 'sonner'
 import { 
   User, MapPin, Globe, Calendar, Star, Edit2, Save, X,
   Plus, Trash2, CheckCircle2, Clock, Sparkles, ShieldCheck,
-  TrendingUp, BookOpen, Heart, Award, Briefcase, Code
+  TrendingUp, BookOpen, Heart, Award, Briefcase, Code, Loader2
 } from 'lucide-react'
 import type { UserSkill, Skill, Review } from '@/lib/types/database'
 
