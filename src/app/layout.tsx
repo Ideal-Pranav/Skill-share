@@ -3,7 +3,6 @@ import { DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/context/auth-context";
 import { Toaster } from "@/components/ui/sonner";
-import { VisualEditsMessenger } from "orchids-visual-edits";
 
 import { ThemeProvider } from "@/components/layout/theme-provider";
 
@@ -21,6 +20,9 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "SkillShare Platform | Learn & Teach Skills Globally",
   description: "Connect with mentors and learners in your community. Share skills, grow together.",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
@@ -43,7 +45,6 @@ export default function RootLayout({
             {children}
             <Toaster position="top-right" richColors />
           </AuthProvider>
-          <VisualEditsMessenger />
         </ThemeProvider>
       </body>
     </html>
